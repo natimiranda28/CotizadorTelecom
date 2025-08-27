@@ -1,58 +1,40 @@
 
-const costoBase = 1000;
+const costoM2 = 1.16;
 
 
-let fm;
+let fmPropiedad;
+let fmUbicacion;
 
 
-let vivienda = prompt(
-    "Ingrese el tipo de vivienda a cotizar:\n" +
-    "1 - Casa\n" +
-    "2 - P.H.\n" +
-    "3 - Dto. Edificio\n" +
-    "4 - Barrio Privado\n" +
-    "5 - Oficina\n" +
-    "6 - Local comercial\n" +
-    "7 - Depósito logística"
-);
+let metros2 = prompt("Ingresa los metros cuadrados de la vivienda:");
+metros2 = parseInt(metros2);
 
 
-switch (vivienda) {
-    case "1":
-        fm = 1.009;
+let tipoVivienda = prompt("Ingresa el tipo de vivienda:\n(Casa, P.H., Dto. Edificio, Barrio Privado, Oficina, Local comercial, Depósito logística)");
+
+
+for (let i = 0; i < datosPropiedad.length; i++) {
+    if (datosPropiedad[i].tipo.toLowerCase() === tipoVivienda.toLowerCase()) {
+        fmPropiedad = datosPropiedad[i];
         break;
-    case "2":
-        fm = 1.005;
-        break;
-    case "3":
-        fm = 1.002;
-        break;
-    case "4":
-        fm = 1.019;
-        break;
-    case "5":
-        fm = 1.039;
-        break;
-    case "6":
-        fm = 1.041;
-        break;
-    case "7":
-        fm = 1.092;
-        break;
-    default:
-        console.warn("El valor ingresado no corresponde a un tipo de vivienda válido.");
+    }
 }
 
 
-let metros = prompt("Ingrese la cantidad de metros cuadrados de la vivienda:");
+let tipoUbicacion = prompt("Ingresa la ubicación:\n(CABA, Tandil, Costa Atlántica)");
 
 
-metros = parseInt(metros);
+for (let i = 0; i < datosUbicacion.length; i++) {
+    if (datosUbicacion[i].tipo.toLowerCase() === tipoUbicacion.toLowerCase()) {
+        fmUbicacion = datosUbicacion[i];
+        break;
+    }
+}
 
 
-if (fm > 1.000 && Number.isInteger(metros) && metros > 0) {
-    let total = costoBase * metros * fm;
-    console.log("El valor de la póliza es: $" + total.toFixed(2));
+if (fmPropiedad && fmUbicacion && Number.isInteger(metros2) && metros2 > 0) {
+    let resultado = costoM2 * metros2 * fmPropiedad.factor * fmUbicacion.factor;
+    console.log("Resultado de la Póliza: $ " + resultado.toFixed(2));
 } else {
-    console.warn("Error en los datos ingresados. Verifique que la vivienda sea válida y los metros cuadrados sean correctos.");
+    console.warn("Hubo un error en los datos ingresados.");
 }
