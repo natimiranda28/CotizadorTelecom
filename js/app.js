@@ -1,29 +1,58 @@
-// 1. Constante para el costo base por m²
-const costoBase = 1.16; 
+
+const costoBase = 1000;
 
 
-const propiedad = document.getElementById("propiedad");
-const ubicacion = document.getElementById("ubicacion");
-const metros2 = document.getElementById("metros2");
-const boton = document.querySelector("button");
-const valorPoliza = document.getElementById("valorPoliza");
+let fm;
 
-// click en el botón Cotizar
-boton.addEventListener("click", () => {
-    // 4. Obtenemos los valores seleccionados
-    let factorPropiedad = Number(propiedad.value);
-    let factorUbicacion = Number(ubicacion.value);
-    let metros = Number(metros2.value);
 
-    // Validacion de entradas
-    if (isNaN(factorPropiedad) || isNaN(factorUbicacion) || metros <= 0) {
-        alert("Por favor, complete todos los campos correctamente.");
-        return;
-    }
+let vivienda = prompt(
+    "Ingrese el tipo de vivienda a cotizar:\n" +
+    "1 - Casa\n" +
+    "2 - P.H.\n" +
+    "3 - Dto. Edificio\n" +
+    "4 - Barrio Privado\n" +
+    "5 - Oficina\n" +
+    "6 - Local comercial\n" +
+    "7 - Depósito logística"
+);
 
-    // 5. Calculamos el valor de la póliza
-    let total = costoBase * metros * factorPropiedad * factorUbicacion;
 
-    // 6. Mostramos el resultado en el HTML, con dos decimales
-    valorPoliza.textContent = total.toFixed(2);
-});
+switch (vivienda) {
+    case "1":
+        fm = 1.009;
+        break;
+    case "2":
+        fm = 1.005;
+        break;
+    case "3":
+        fm = 1.002;
+        break;
+    case "4":
+        fm = 1.019;
+        break;
+    case "5":
+        fm = 1.039;
+        break;
+    case "6":
+        fm = 1.041;
+        break;
+    case "7":
+        fm = 1.092;
+        break;
+    default:
+        console.warn("El valor ingresado no corresponde a un tipo de vivienda válido.");
+}
+
+
+let metros = prompt("Ingrese la cantidad de metros cuadrados de la vivienda:");
+
+
+metros = parseInt(metros);
+
+
+if (fm > 1.000 && Number.isInteger(metros) && metros > 0) {
+    let total = costoBase * metros * fm;
+    console.log("El valor de la póliza es: $" + total.toFixed(2));
+} else {
+    console.warn("Error en los datos ingresados. Verifique que la vivienda sea válida y los metros cuadrados sean correctos.");
+}
