@@ -1,4 +1,4 @@
-🏡 Cotizador de Pólizas de Vivienda
+🏡 Cotizador de Pólizas de Vivienda de TELECOM
 
 Este proyecto es una aplicación sencilla en **JavaScript**, acompañada de un HTML y CSS ya provistos, que permite calcular el valor estimado de una póliza de seguro de hogar o comercio.
 
