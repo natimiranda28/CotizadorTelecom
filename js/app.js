@@ -7,12 +7,11 @@ const selUbicacion = document.getElementById("ubicacion");
 const inputMetros = document.getElementById("metros2");
 const btnCotizar = document.querySelector(".button");
 const spanValor = document.getElementById("valorPoliza");
+const divQuote = document.querySelector(".div-quote"); // contenedor principal
 
 // ====== Carga dinámica de <select> ======
 function cargarComboPropiedad() {
-  // Resetea e inserta placeholder
   selPropiedad.innerHTML = `<option selected disabled value="">...</option>`;
-  // Arma options desde datosPropiedad (variables.js)
   let html = "";
   for (const item of datosPropiedad) {
     html += `<option value="${item.tipo}">${item.tipo}</option>`;
@@ -31,10 +30,9 @@ function cargarComboUbicacion() {
 
 // ====== Búsqueda de factores según selección ======
 function obtenerFactoresSeleccionados() {
-  const tipoPropSel = selPropiedad.value;   // ej. "Casa"
-  const tipoUbiSel = selUbicacion.value;    // ej. "CABA"
+  const tipoPropSel = selPropiedad.value;
+  const tipoUbiSel = selUbicacion.value;
 
-  // Busca el objeto en cada array por 'tipo'
   const fmPropiedad = datosPropiedad.find(p => p.tipo === tipoPropSel);
   const fmUbicacion = datosUbicacion.find(u => u.tipo === tipoUbiSel);
 
@@ -42,13 +40,20 @@ function obtenerFactoresSeleccionados() {
 }
 
 // ====== Utilidades ======
+function formatearNumero(valor) {
+  // redondea a 2 decimales con toFixed
+  return Number(valor).toFixed(2);
+}
+
 function formatearARS(valor) {
-  
-  return new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 2 }).format(valor);
+  return new Intl.NumberFormat("es-AR", {
+    style: "currency",
+    currency: "ARS",
+    maximumFractionDigits: 2
+  }).format(valor);
 }
 
 function animarBoton() {
-
   btnCotizar.animate(
     [
       { transform: "scale(1)", opacity: 1 },
@@ -65,7 +70,6 @@ function validarEntrada(metros, fmPropiedad, fmUbicacion) {
   const mayorCero = metros > 0;
   const fmValidos = fmPropiedad?.factor > 1.0 && fmUbicacion?.factor >= 1.0;
 
-  // Si el input tiene min/max, respetarlos también
   const min = inputMetros.min ? parseInt(inputMetros.min) : 1;
   const max = inputMetros.max ? parseInt(inputMetros.max) : Infinity;
   const dentroDeRango = metros >= min && metros <= max;
@@ -83,7 +87,7 @@ function validarEntrada(metros, fmPropiedad, fmUbicacion) {
     return false;
   }
   if (!fmValidos) {
-    console.warn("Los factores seleccionados no son válidos (> 1.000 para propiedad, ≥ 1.000 para ubicación).");
+    console.warn("Los factores seleccionados no son válidos.");
     return false;
   }
   return true;
@@ -91,8 +95,6 @@ function validarEntrada(metros, fmPropiedad, fmUbicacion) {
 
 // ====== Cálculo ======
 function calcularPoliza() {
-  animarBoton();
-
   const metros = parseInt(inputMetros.value);
   const { fmPropiedad, fmUbicacion } = obtenerFactoresSeleccionados();
 
@@ -103,21 +105,40 @@ function calcularPoliza() {
 
   const total = costoM2 * metros * fmPropiedad.factor * fmUbicacion.factor;
 
-  // Log detallado en consola como pide la consigna
   console.log("=== Cálculo de póliza ===");
   console.log("Metros²:", metros);
   console.log("Propiedad:", fmPropiedad.tipo, "| factor:", fmPropiedad.factor);
-  console.log("Ubicación:", fmUbicacion.tipo,  "| factor:", fmUbicacion.factor);
+  console.log("Ubicación:", fmUbicacion.tipo, "| factor:", fmUbicacion.factor);
   console.log("Costo base m²:", costoM2);
   console.log("Resultado:", formatearARS(total));
 
-  // Mostrar en el HTML formateado (y sin símbolo si preferís)
-  spanValor.textContent = new Intl.NumberFormat("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(total);
+  spanValor.textContent = formatearNumero(total);
+}
+
+// ====== Handler con bloqueo y loader ======
+function manejarCotizacion() {
+  animarBoton();
+
+  // Bloquea la UI
+  divQuote.classList.add("div-blocked");
+
+  // Reemplaza botón con loader
+  const textoOriginal = btnCotizar.innerHTML;
+  btnCotizar.innerHTML = `<img src="./images/loading.gif" alt="Cargando..." style="height:20px;">`;
+
+  // Espera 2 segundos antes de calcular
+  setTimeout(() => {
+    calcularPoliza();
+
+    // Restaurar botón y desbloquear UI
+    btnCotizar.innerHTML = textoOriginal;
+    divQuote.classList.remove("div-blocked");
+  }, 2000);
 }
 
 // ====== Init ======
 document.addEventListener("DOMContentLoaded", () => {
   cargarComboPropiedad();
   cargarComboUbicacion();
-  btnCotizar.addEventListener("click", calcularPoliza);
+  btnCotizar.addEventListener("click", manejarCotizacion);
 });
